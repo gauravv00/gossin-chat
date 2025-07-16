@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        /* Import font */
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
+        /* General styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Neue', Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background-color: #111;
+        }
+
+        .features {
+            background-color: #ff5c5c;
+            color: #fff;
+            width: 25%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .features h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .features ul {
+            list-style-type: none;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .features li::before {
+            content: '💬';
+            font-size: 20px;
+            margin-right: 10px;
+            color: #fff;
+        }
+
+        .signup {
+            background-color: #000;
+            color: #fff;
+            width: 75%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .signup h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .signup p {
+            font-size: 14px;
+            color: #ccc;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .signup form {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-group {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .signup input[type="text"],
+        .signup input[type="email"],
+        .signup input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .signup button {
+            background-color: #ff5c5c;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .signup a {
+            color: #ff5c5c;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+
+        .signup a:hover {
+            text-decoration: underline;
+        }
+
+        /* Add these new styles to your existing CSS */
+        .otp-section {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .otp-input {
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 20px !important;
+        }
+
+        .otp-message {
+            color: #ccc;
+            font-size: 14px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .resend-link {
+            color: #ff5c5c;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+
+        .signup-progress {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-step.active {
+            background-color: #ff5c5c;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #333;
+            z-index: 0;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .form-message {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .form-message.success {
+            background-color: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .form-message.error {
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+
+        /* Terms Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #222;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            color: #fff;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #ff5c5c;
+            border-radius: 4px;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ff5c5c;
+        }
+
+        .terms-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .terms-link {
+            color: #ff5c5c;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .terms-link:hover {
+            color: #ff8080;
+        }
+
+        .modal-content h2 {
+            font-family: 'Comic Neue', cursive;
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ff5c5c;
+        }
+
+        .modal-content h3 {
+            font-family: 'Comic Neue', cursive;
+            font-weight: 700;
+            font-size: 20px;
+            margin: 15px 0;
+            color: #ff80ab;
+        }
+
+        .modal-content p, .modal-content li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .modal-content ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-content ul li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Chat in any Discussion</li>
+                <li>Free forever</li>
+            </ul>
+        </div>
+
+        <div class="signup">
+            <h2>Sign Up</h2>
+            <p>Your information is collected solely to avoid spam and maintain decorum. You will remain completely anonymous, and only your username will be visible in discussions.</p>
+            
+            <div class="signup-progress">
+                <div class="progress-line"></div>
+                <div class="progress-step active">1</div>
+                <div class="progress-step">2</div>
+            </div>
+
+            <div class="form-message"></div>
+
+            <form id="signupForm">
+                <div class="signup-step-1">
+                    <input type="text" id="username" placeholder="Username" required>
+                    <div class="input-group">
+                        <input type="text" id="firstName" placeholder="First Name" required>
+                        <input type="text" id="lastName" placeholder="Last Name" required>
+                    </div>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <p id="passwordStrength" style="color: red;"></p>
+                    <div class="input-group">
+                        <input type="text" id="course" placeholder="Course" required>
+                        <input type="text" id="rollNo" placeholder="Roll No." required>
+                    </div>
+                </div>
+
+                <div class="otp-section">
+                    <p class="otp-message">Please enter the verification code sent to your email</p>
+                    <input type="text" 
+                           id="otp" 
+                           class="otp-input" 
+                           placeholder="000000" 
+                           maxlength="6">
+                    <p class="otp-message">
+                        Didn't receive the code? 
+                        <a href="#" class="resend-link" id="resendOtp">Resend</a>
+                    </p>
+                </div>
+
+                <div class="terms-checkbox-container">
+                    <input type="checkbox" id="termsCheckbox" required>
+                    <label for="termsCheckbox">
+                        I agree to the <span class="terms-link" onclick="showTermsModal()">Terms & Conditions</span>
+                    </label>
+                </div>
+
+                <button type="submit" id="signupButton">
+                    <span>Sign Up</span>
+                    <div class="loading-spinner"></div>
+                </button>
+                
+                <a href="login.htm">Already have an account? Log in</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeTermsModal()">&times;</span>
+            <div id="termsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let isOtpSent = false;
+        const signupForm = document.getElementById("signupForm");
+        const otpSection = document.querySelector(".otp-section");
+        const step1 = document.querySelector(".signup-step-1");
+        const progressSteps = document.querySelectorAll(".progress-step");
+        const submitButton = signupForm.querySelector("button");
+        const loadingSpinner = document.querySelector(".loading-spinner");
+        const formMessage = document.querySelector(".form-message");
+
+        function showMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type}`;
+            formMessage.style.display = 'block';
+            setTimeout(() => {
+                formMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function setLoading(isLoading) {
+            submitButton.disabled = isLoading;
+            loadingSpinner.style.display = isLoading ? 'inline-block' : 'none';
+        }
+
+        signupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            setLoading(true);
+
+            try {
+                if (!isOtpSent) {
+                    // Step 1: Request OTP
+                    const response = await fetch("http://localhost:3000/api/auth/signup/init", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            email: document.getElementById("email").value.trim()
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to send verification code');
+                    }
+
+                    // Update UI for OTP step
+                    step1.style.display = "none";
+                    otpSection.style.display = "block";
+                    submitButton.textContent = "Verify & Complete";
+                    progressSteps[1].classList.add("active");
+                    isOtpSent = true;
+                    
+                    // Add required attribute to OTP input when it becomes visible
+                    document.getElementById("otp").setAttribute("required", "required");
+                    
+                    showMessage("Verification code sent to your email", "success");
+                } else {
+                    // Step 2: Complete signup with OTP
+                    const userData = {
+                        username: document.getElementById("username").value.trim(),
+                        firstName: document.getElementById("firstName").value.trim(),
+                        lastName: document.getElementById("lastName").value.trim(),
+                        email: document.getElementById("email").value.trim(),
+                        password: document.getElementById("password").value.trim(),
+                        course: document.getElementById("course").value.trim(),
+                        rollNo: document.getElementById("rollNo").value.trim(),
+                        otp: document.getElementById("otp").value.trim()
+                    };
+
+                    console.log('About to send verification request with data:', {
+                        ...userData,
+                        password: '***',
+                        otpLength: userData.otp.length
+                    });
+
+                    const response = await fetch("http://localhost:3000/api/auth/signup/verify", {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify(userData)
+                    });
+
+                    const responseData = await response.json();
+                    console.log('Server response:', responseData);
+
+                    if (!response.ok) {
+                        throw new Error(responseData.error || 'Verification failed');
+                    }
+
+                    showMessage(responseData.message, "success");
+                    setTimeout(() => {
+                        window.location.href = "login.htm";
+                    }, 2000);
+                }
+            } catch (error) {
+                showMessage(error.message, "error");
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        document.getElementById("resendOtp").addEventListener("click", async (e) => {
+            e.preventDefault();
+            setLoading(true);
+
+            try {
+                const response = await fetch("http://localhost:3000/api/auth/signup/init", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: document.getElementById("email").value.trim()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to resend verification code');
+                }
+
+                showMessage("Verification code resent successfully", "success");
+            } catch (error) {
+                showMessage(error.message, "error");
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Password strength indicator
+        document.getElementById("password").addEventListener("input", function(e) {
+            const password = e.target.value;
+            const strengthText = document.getElementById("passwordStrength");
+            
+            if (password.length < 8) {
+                strengthText.textContent = "Password must be at least 8 characters long";
+                strengthText.style.color = "#ff0000";
+            } else if (!/[A-Z]/.test(password)) {
+                strengthText.textContent = "Password must contain at least one uppercase letter";
+                strengthText.style.color = "#ff0000";
+            } else if (!/[a-z]/.test(password)) {
+                strengthText.textContent = "Password must contain at least one lowercase letter";
+                strengthText.style.color = "#ff0000";
+            } else if (!/[0-9]/.test(password)) {
+                strengthText.textContent = "Password must contain at least one number";
+                strengthText.style.color = "#ff0000";
+            } else {
+                strengthText.textContent = "Password strength: Strong";
+                strengthText.style.color = "#00ff00";
+            }
+        });
+
+        // Terms & Conditions Modal
+        function showTermsModal() {
+            const modal = document.getElementById('termsModal');
+            const termsContent = document.getElementById('termsContent');
+            
+            const terms = `
+                <h2>Terms and Conditions of Service</h2>
+
+                <p>Welcome to Gossin (hereinafter referred to as the "Platform"). By accessing or using the Platform, you, the user ("User"), explicitly agree to comply with and be bound by the following Terms and Conditions of Service (hereinafter referred to as the "Terms"). If you do not agree to these Terms, you must immediately cease using the Platform.</p>
+
+                <h3>1. Definitions</h3>
+                <p>1.1 "Platform" refers to the services provided by Gossin, including all associated software, APIs, and databases, currently operating using Socket.IO and MongoDB Compass technologies.</p>
+                <p>1.2 "User" refers to any individual who accesses, registers, or otherwise interacts with the Platform.</p>
+
+                <h3>2. Eligibility</h3>
+                <p>2.1 Users must be at least 18 years of age or possess parental consent to use the Platform. By registering, the User warrants that they meet these eligibility requirements.</p>
+                <p>2.2 The Platform reserves the right to verify the authenticity of the User's information and may suspend or terminate access if eligibility requirements are not met.</p>
+
+                <h3>3. Data Collection and Privacy</h3>
+                <p>3.1 <strong>Collected Data:</strong> The Platform collects and processes User data, including but not limited to username, first name, last name, email address, and college name, for account creation and operational purposes.</p>
+                <p>3.2 <strong>Data Usage:</strong> The User consents to the processing of their data in accordance with the Privacy Policy, which forms an integral part of these Terms.</p>
+                <p>3.3 <strong>Data Security:</strong> While the Platform implements reasonable security measures, it does not warrant that unauthorized access, hacking, data loss, or breaches will never occur.</p>
+                <p>3.4 <strong>Anonymity:</strong> Posts designated as "anonymous" will not publicly disclose the User's identity; however, metadata, such as IP addresses, may be retained for compliance and security purposes.</p>
+                <p>3.5 <strong>Disclosure:</strong> User data may be disclosed to law enforcement agencies or other entities as required by applicable laws or judicial orders.</p>
+
+                <h3>4. User Responsibilities</h3>
+                <p>4.1 The User acknowledges that they are solely responsible for the content they post on the Platform. The Platform functions strictly as an intermediary under Section 79 of the Information Technology Act, 2000.</p>
+                <p>4.2 Users agree not to post content that:</p>
+                <ul>
+                    <li>a. Violates any applicable law or regulation;</li>
+                    <li>b. Is defamatory, obscene, threatening, hateful, or incites violence;</li>
+                    <li>c. Infringes intellectual property rights, privacy rights, or other proprietary rights of any third party.</li>
+                </ul>
+
+                <h3>5. Prohibited Activities</h3>
+                <p>5.1 Users shall not engage in:</p>
+                <ul>
+                    <li>a. Uploading malicious software, viruses, or scripts that could harm the Platform's infrastructure;</li>
+                    <li>b. Circumventing security features or accessing unauthorized areas of the Platform;</li>
+                    <li>c. Impersonating another individual or misrepresenting their identity.</li>
+                </ul>
+
+                <h3>6. Platform Functionality and Limitations</h3>
+                <p>6.1 The Platform is provided "AS IS" and "AS AVAILABLE." No warranties, either express or implied, are provided regarding uninterrupted or error-free operation of the Platform.</p>
+                <p>6.2 The Platform makes no representations or guarantees regarding the security, reliability, or accuracy of content or services provided.</p>
+                <p>6.3 The Platform expressly disclaims liability for loss of data due to server errors, maintenance activities, or unauthorized access.</p>
+
+                <h3>7. Content Ownership and Licensing</h3>
+                <p>7.1 Users retain ownership of the content they post. However, by posting content, Users grant the Platform a non-exclusive, royalty-free, worldwide license to store, display, and distribute such content.</p>
+                <p>7.2 The Platform reserves the right to remove content that violates these Terms or applicable laws.</p>
+
+                <h3>8. Indemnification</h3>
+                <p>8.1 Users agree to indemnify, defend, and hold harmless the Platform, its operators, employees, and affiliates from any claims, damages, or liabilities arising from:</p>
+                <ul>
+                    <li>a. User-generated content;</li>
+                    <li>b. Breaches of these Terms;</li>
+                    <li>c. Violations of applicable laws or third-party rights.</li>
+                </ul>
+
+                <h3>9. Modification of Terms</h3>
+                <p>9.1 The Platform reserves the right to amend these Terms at its discretion. Users will be notified of significant changes via the Platform or other means of communication. Continued use of the Platform constitutes acceptance of the updated Terms.</p>
+
+                <h3>10. Severability</h3>
+                <p>10.1 If any provision of these Terms is deemed invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>`;
+            
+            termsContent.innerHTML = terms;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeTermsModal() {
+            const modal = document.getElementById('termsModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('termsModal');
+            if (event.target === modal) {
+                closeTermsModal();
+            }
+        }
+    </script>
+</body>
+</html>

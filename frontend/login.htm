@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* General styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Main container styling */
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background-color: #111;
+        }
+
+        /* Features sidebar styling */
+        .features {
+            background-color: #ff5c5c;
+            color: #fff;
+            width: 25%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .features h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .features ul {
+            list-style-type: none;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .features li::before {
+            content: '💬';
+            font-size: 20px;
+            margin-right: 10px;
+            color: #fff;
+        }
+
+        /* Login form styling */
+        .login {
+            background-color: #000;
+            color: #fff;
+            width: 75%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .login h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .login form {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login input[type="email"],
+        .login input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .login button {
+            background-color: #ff5c5c;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .login a {
+            color: #ff5c5c;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+
+        .login a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        #loadingIndicator {
+            display: none;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Features Sidebar -->
+        <div class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Chat in any Discussion</li>
+                <li>Free forever</li>
+            </ul>
+        </div>
+        
+        <!-- Login Form -->
+        <div class="login">
+            <h2>Log in</h2>
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           placeholder="Email" 
+                           required>
+                </div>
+                <div class="form-group">
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Password" 
+                           required>
+                </div>
+                <button type="submit" id="loginButton">Log in</button>
+                <div id="loadingIndicator">Logging in...</div>
+            </form>
+            <p>Don't have an account? <a href="Signuppage.htm">Sign up</a></p>
+        </div>
+        
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is already logged in
+            const token = localStorage.getItem('token');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            if (token && userData.id) {
+                window.location.href = 'homepage.htm';
+                return;
+            }
+        });
+
+        const form = document.getElementById("loginForm");
+        const loginButton = document.getElementById("loginButton");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+
+        // Clear any stored credentials
+        window.onload = () => {
+            form.reset();
+            document.getElementById("email").value = '';
+            document.getElementById("password").value = '';
+        };
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            console.log('Login form submitted');
+
+            // Show loading state
+            loginButton.disabled = true;
+            loadingIndicator.style.display = 'block';
+
+            const credentials = {
+                email: document.getElementById("email").value.trim(),
+                password: document.getElementById("password").value.trim(),
+            };
+
+            try {
+                console.log('Sending login request with:', {
+                    email: credentials.email,
+                    passwordLength: credentials.password?.length,
+                    passwordFirstFourChars: credentials.password?.substring(0, 4)
+                });
+
+                const response = await fetch("http://localhost:3000/api/auth/login", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    credentials: 'include',
+                    mode: 'cors',
+                    body: JSON.stringify(credentials)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Login response:', data);
+
+                if (!data.user) {
+                    throw new Error('Invalid response from server');
+                }
+
+                // Store user data
+                localStorage.setItem('userData', JSON.stringify(data.user));
+                localStorage.setItem('token', data.token);
+                sessionStorage.setItem('isAuthenticated', 'true');
+
+                // Add a deliberate delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Redirect to homepage
+                window.location.href = 'homepage.htm';
+
+            } catch (error) {
+                console.error('Login error:', error);
+                alert(error.message || 'Login failed. Please try again.');
+            } finally {
+                loginButton.disabled = false;
+                loadingIndicator.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

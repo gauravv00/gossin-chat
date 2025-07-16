@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classroom Drama - Coming Soon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+            color: #fff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff5c5c, #ff80ab);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #fff;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .coming-soon-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            gap: 30px;
+        }
+
+        .coming-soon-title {
+            font-size: 48px;
+            color: #ff5c5c;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .coming-soon-text {
+            font-size: 20px;
+            color: #fff;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .other-rooms {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .room-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .room-card h3 {
+            color: #ff80ab;
+            margin-bottom: 10px;
+        }
+
+        .room-card p {
+            color: #ddd;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .visit-btn {
+            background: linear-gradient(135deg, #ff5c5c, #ff80ab);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .visit-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .coming-soon-title {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+
+            .coming-soon-text {
+                font-size: 16px;
+                padding: 0 20px;
+                margin-bottom: 20px;
+            }
+
+            .other-rooms {
+                gap: 15px;
+                padding: 0 10px;
+            }
+
+            .room-card {
+                width: calc(50% - 15px);
+                min-width: 200px;
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .back-button {
+                font-size: 20px;
+                margin-right: 10px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .coming-soon-title {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+
+            .coming-soon-text {
+                font-size: 14px;
+                padding: 0 15px;
+                margin-bottom: 15px;
+            }
+
+            .other-rooms {
+                gap: 10px;
+            }
+
+            .room-card {
+                width: 100%;
+                margin: 0 10px;
+            }
+
+            .room-card h3 {
+                font-size: 18px;
+            }
+
+            .room-card p {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+
+            .visit-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+
+            .header {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="homepage.htm" class="back-button">←</a>
+            <h1>Classroom Drama</h1>
+        </div>
+        
+        <div class="coming-soon-content">
+            <h1 class="coming-soon-title">Coming Soon!</h1>
+            <p class="coming-soon-text">
+                We're working hard to bring you the ultimate classroom drama experience. 
+                In the meantime, check out our other exciting chat rooms below!
+            </p>
+            
+            <div class="other-rooms">
+                <div class="room-card">
+                    <h3>Gossip Room</h3>
+                    <p>Spill the tea and share the latest campus gossip!</p>
+                    <button class="visit-btn" onclick="window.location.href='Gossip.htm'">Visit Room</button>
+                </div>
+                
+                <div class="room-card">
+                    <h3>Confession Room</h3>
+                    <p>Share your secrets and confessions anonymously.</p>
+                    <button class="visit-btn" onclick="window.location.href='Confession.htm'">Visit Room</button>
+                </div>
+                
+                <div class="room-card">
+                    <h3>Opinion Room</h3>
+                    <p>Share your thoughts and experiences with others!</p>
+                    <button class="visit-btn" onclick="window.location.href='Opinion.htm'">Visit Room</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

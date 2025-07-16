@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gossip Room</title>
+    <style>
+        /* General Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+            color: #fff;
+            position: relative;
+            padding-bottom: 0;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ff5c5c, #ff80ab);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #fff;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        #username-display {
+            color: #fff;
+            font-size: 16px;
+        }
+
+        /* Chat Section */
+        #chat-container {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 15px;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #333333, #1a1a1a);
+            margin-bottom: 95px;
+            scroll-behavior: smooth;
+        }
+
+        /* Message Styling */
+        .message {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+            position: relative;
+            background: #2a2a2a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #ff5c5c;
+            color: #fff;
+        }
+
+        /* Message Content */
+        .message-content {
+            position: relative;
+            width: 100%;
+        }
+
+        .message-content .username {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fdfdfd;
+        }
+
+        .message-content .text {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .message-content .timestamp {
+            font-size: 12px;
+            color: #bbb;
+            align-self: flex-end;
+        }
+
+        /* Message Actions */
+        .message-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .comment-button, 
+        .report-button,
+        .report-status {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .comment-button:hover, 
+        .report-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Chat Input Section */
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            width: 80%;
+            max-width: 1200px;
+            min-width: 800px;
+        }
+
+        #send-button {
+            background: #ff5c5c;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        #send-button:hover {
+            background: #ff4444;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            color: #888;
+            font-style: italic;
+            font-size: 14px;
+            z-index: 999;
+        }
+
+        /* Mode Indicator */
+        #mode-indicator {
+            background: linear-gradient(135deg, #ffcc80, #ff9800);
+            color: #1a1a1a;
+            padding: 15px 20px;
+            text-align: center;
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            font-weight: bold;
+            z-index: 1000;
+            border: none;
+        }
+
+        #close-comment-mode {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Character Count */
+        #char-count {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: right;
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 997;
+        }
+       
+        /* Placeholder Color */
+        #chat-input::placeholder {
+            color: #aaa;
+        }
+
+        /* Commenting Section */
+        .comments {
+            margin-top: 10px;
+            padding-left: 20px;
+            font-size: 14px;
+            color: #fff;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .comment {
+            margin-top: 5px;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        /* Character Count Styling */
+        .character-count {
+            font-size: 12px;
+            color: #bbb;
+            text-align: right;
+            padding: 5px 20px;
+            background-color: #111;
+        }
+
+        /* Mode Indicator */
+        .mode-indicator {
+            background-color: #ffcc80;
+            padding: 10px;
+            text-align: center;
+            color: #1a1a1a;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+            display: none;
+        }
+
+        #close-comment-mode {
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        /* Report Status */
+        .report-status {
+            color: white;
+            font-size: 14px;
+            display: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: default;
+            margin-left: 0;
+        }
+
+        /* Add these styles to your existing CSS */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Report Dialog Styling */
+        .report-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            width: 400px;
+            color: #fff;
+        }
+
+        .report-dialog h3 {
+            margin-bottom: 20px;
+            color: #fff;
+            font-size: 1.2em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .report-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .report-category, .report-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .report-dialog label {
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        .report-dialog select {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ff91a4;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .report-dialog select option {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .report-dialog textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #ff91a4;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 0.9em;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .report-dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .report-dialog button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .report-submit {
+            background: #ff5c5c;
+            color: white;
+        }
+
+        .report-submit:hover {
+            background: #ff4242;
+        }
+
+        .report-cancel {
+            background: #444;
+            color: white;
+        }
+
+        .report-cancel:hover {
+            background: #555;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+
+        /* Message Actions */
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .comment-button,
+        .report-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .comment-button:hover,
+        .report-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Comments Section */
+        .comments {
+            margin-top: 10px;
+            padding-left: 15px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .comment {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .comment .username {
+            color: #ff80ab;
+            font-weight: bold;
+            display: inline;
+        }
+
+        .comment .timestamp {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-left: 8px;
+            display: inline;
+        }
+
+        /* Mode Indicator */
+        #mode-indicator {
+            background: linear-gradient(135deg, #ffcc80, #ff9800);
+            color: #1a1a1a;
+            padding: 10px 20px;
+            text-align: center;
+            display: none;
+            position: relative;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #close-comment-mode {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            padding: 5px;
+            font-weight: bold;
+        }
+
+        #close-comment-mode:hover {
+            opacity: 0.8;
+        }
+
+        /* Report Status */
+        .report-status {
+            color: white;
+            font-size: 14px;
+            display: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: default;
+            margin-left: 0;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            #chat-input {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .input-container {
+                padding: 10px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            #username-display {
+                font-size: 14px;
+            }
+
+            .logout-btn {
+                padding: 4px 10px;
+                font-size: 12px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .header {
+                padding: 10px;
+            }
+
+            .back-button {
+                font-size: 20px;
+                margin-right: 10px;
+            }
+
+            #chat-container {
+                padding: 10px;
+                margin-bottom: 85px;
+            }
+
+            .message {
+                max-width: 90%;
+                padding: 10px;
+            }
+
+            .message-content .text {
+                font-size: 14px;
+            }
+
+            .message-content .timestamp {
+                font-size: 10px;
+            }
+
+            .comment-button, .report-button {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="homepage.htm" class="back-button">←</a>
+            <h1>Gossip Room</h1>
+            <div class="user-info">
+                <span id="username-display"></span>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+        <div id="chat-container"></div>
+        <div class="typing-indicator" id="typing-indicator"></div>
+        <div id="mode-indicator">
+            Commenting on message... 
+            <span id="close-comment-mode">✕</span>
+        </div>
+        <div class="input-container">
+            <input type="text" id="chat-input" placeholder="Type your gossip..">
+            <button id="send-button">Send</button>
+        </div>
+        <div id="char-count">Characters remaining: 500</div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        let selectedMessageForReport = null;
+
+        function openReportDialog(messageDiv) {
+            selectedMessageForReport = messageDiv;
+            const overlay = document.getElementById('overlay');
+            const reportDialog = document.getElementById('report-dialog');
+            const reportReason = document.getElementById('report-reason');
+            
+            overlay.style.display = 'block';
+            reportDialog.style.display = 'block';
+            reportReason.value = '';
+            reportReason.focus();
+        }
+
+        function closeReportDialog() {
+            const overlay = document.getElementById('overlay');
+            const reportDialog = document.getElementById('report-dialog');
+            
+            overlay.style.display = 'none';
+            reportDialog.style.display = 'none';
+            selectedMessageForReport = null;
+        }
+
+        async function submitReport() {
+            try {
+                const reportType = document.getElementById('report-type').value;
+                const additionalDetails = document.getElementById('report-reason').value.trim();
+                
+                if (!reportType || !selectedMessageForReport) {
+                    throw new Error('Please select a report reason');
+                }
+
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('Not authenticated');
+                }
+
+                const reportData = {
+                    messageId: selectedMessageForReport.id,
+                    reportType: reportType,
+                    additionalDetails: additionalDetails,
+                    reportedUser: selectedMessageForReport.querySelector('.username').textContent,
+                    messageContent: selectedMessageForReport.querySelector('.text').textContent
+                };
+
+                console.log('Attempting to submit report with data:', reportData);
+                console.log('Using token:', token);
+
+                const response = await fetch('http://localhost:3000/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(reportData)
+                });
+
+                console.log('Response status:', response.status);
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (error) {
+                    console.error('Failed to parse response:', error);
+                    console.log('Response text was:', responseText);
+                    throw new Error('Invalid server response');
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to submit report');
+                }
+
+                // Update UI on success
+                const reportButton = selectedMessageForReport.querySelector('.report-button');
+                const reportStatus = selectedMessageForReport.querySelector('.report-status');
+                
+                reportButton.style.display = 'none';
+                reportStatus.style.display = 'inline';
+                reportStatus.textContent = '🚫 Reported';
+                
+                closeReportDialog();
+                
+                // Show success message
+                const successMessage = document.createElement('div');
+                successMessage.className = 'report-success-message';
+                successMessage.textContent = 'Thank you for your report. We will review it shortly.';
+                successMessage.style.position = 'fixed';
+                successMessage.style.top = '20px';
+                successMessage.style.left = '50%';
+                successMessage.style.transform = 'translateX(-50%)';
+                successMessage.style.backgroundColor = '#4CAF50';
+                successMessage.style.color = 'white';
+                successMessage.style.padding = '15px 30px';
+                successMessage.style.borderRadius = '5px';
+                successMessage.style.zIndex = '1000';
+                document.body.appendChild(successMessage);
+                
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error submitting report:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'report-error-message';
+                errorMessage.textContent = error.message || 'Failed to submit report. Please try again.';
+                errorMessage.style.position = 'fixed';
+                errorMessage.style.top = '20px';
+                errorMessage.style.left = '50%';
+                errorMessage.style.transform = 'translateX(-50%)';
+                errorMessage.style.backgroundColor = '#f44336';
+                errorMessage.style.color = 'white';
+                errorMessage.style.padding = '15px 30px';
+                errorMessage.style.borderRadius = '5px';
+                errorMessage.style.zIndex = '1000';
+                document.body.appendChild(errorMessage);
+                
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 3000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Gossip.htm loaded');
+            
+            // Initialize DOM elements
+            const chatContainer = document.getElementById('chat-container');
+            const messageInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const modeIndicator = document.getElementById('mode-indicator');
+            const charCountDisplay = document.getElementById('char-count');
+            const closeCommentMode = document.getElementById('close-comment-mode');
+            const usernameDisplay = document.getElementById('username-display');
+            
+            let typingTimeout;
+            let isCommentMode = false;
+            let selectedMessage = null;
+            let socket = null;
+            const maxChars = 500;
+            
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData.username) {
+                usernameDisplay.textContent = userData.username;
+            }
+            
+            // Reset comment mode function
+            function resetCommentMode() {
+                isCommentMode = false;
+                selectedMessage = null;
+                modeIndicator.style.display = 'none';
+                messageInput.placeholder = 'Share your thoughts...';
+            }
+
+            // Character count update
+            messageInput.addEventListener('input', () => {
+                const remainingChars = maxChars - messageInput.value.length;
+                charCountDisplay.textContent = `${remainingChars} characters remaining`;
+                
+                // Typing indicator logic
+                clearTimeout(typingTimeout);
+                if (socket) {
+                    socket.emit('typing', {
+                        room: 'gossip',
+                        username: userData.username,
+                        isTyping: true
+                    });
+
+                    typingTimeout = setTimeout(() => {
+                        socket.emit('typing', {
+                            room: 'gossip',
+                            username: userData.username,
+                            isTyping: false
+                        });
+                    }, 1000);
+                }
+            });
+
+            messageInput.addEventListener('blur', () => {
+                if (socket) {
+                    socket.emit('typing', {
+                        room: 'gossip',
+                        username: userData.username,
+                        isTyping: false
+                    });
+                }
+            });
+
+            // Close comment mode when clicking the X
+            closeCommentMode.addEventListener('click', resetCommentMode);
+
+            // Submit comment function
+            async function submitComment() {
+                const commentText = messageInput.value.trim();
+                if (!commentText || !selectedMessage) return;
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/comments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            messageId: selectedMessage.dataset.messageId,
+                            comment: commentText,
+                            username: userData.username
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to submit comment');
+
+                    // Don't manually add the comment here since we'll receive it via socket
+                    messageInput.value = '';
+                    resetCommentMode();
+                    
+                } catch (error) {
+                    console.error('Error submitting comment:', error);
+                    alert('Failed to submit comment. Please try again.');
+                }
+            }
+
+            // Send message function
+            async function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (!messageText) return;
+                
+                if (messageText.length > maxChars) {
+                    alert(`Message cannot exceed ${maxChars} characters`);
+                    return;
+                }
+
+                if (isCommentMode) {
+                    await submitComment();
+                } else {
+                    if (!userData || !userData.username) {
+                        alert('Please log in to send messages');
+                        return;
+                    }
+
+                    socket.emit('chatMessage', {
+                        room: 'gossip',
+                        username: userData.username,
+                        text: messageText
+                    });
+                    messageInput.value = '';
+                    charCountDisplay.textContent = `${maxChars} characters remaining`;
+                }
+            }
+
+            // Add event listeners
+            sendButton.addEventListener('click', sendMessage);
+            
+            // Add enter key functionality
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // Prevent default to avoid new line
+                    sendMessage();
+                }
+            });
+
+            // Initialize socket connection and other event listeners...
+            try {
+                console.log('Initializing chat...');
+                socket = io('http://localhost:3000', {
+                    withCredentials: true,
+                });
+
+                socket.on('connect', () => {
+                    console.log('Connected to server');
+                    socket.emit('joinRoom', 'gossip');
+                });
+
+                socket.on('connect_error', (error) => {
+                    console.error('Socket connection error:', error);
+                });
+
+                socket.on('message', (data) => {
+                    displayMessage(data);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
+
+                socket.on('previousMessages', (messages) => {
+                    chatContainer.innerHTML = ''; // Clear existing messages
+                    console.log('Received previous messages:', messages);
+                    messages.forEach(msg => {
+                        displayMessage({
+                            username: msg.username,
+                            text: msg.message,
+                            timestamp: new Date(msg.createdAt).toLocaleTimeString(),
+                            _id: msg._id,
+                            comments: msg.comments || []
+                        });
+                    });
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                });
+
+                // Handle new comments
+                socket.on('newComment', (data) => {
+                    console.log('Received new comment:', data);
+                    const messageDiv = document.getElementById(data.messageId);
+                    if (messageDiv) {
+                        const commentsContainer = messageDiv.querySelector('.comments-container');
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment';
+                        commentElement.innerHTML = `
+                            <span class="comment-username">${data.username}</span>
+                            <span class="comment-text">${data.comment}</span>
+                            <span class="comment-timestamp">${data.timestamp}</span>
+                        `;
+                        commentsContainer.appendChild(commentElement);
+                    }
+                });
+
+                // Handle typing indicator
+                socket.on('userTyping', (data) => {
+                    if (data.isTyping) {
+                        typingIndicator.textContent = `${data.username} is typing...`;
+                    } else {
+                        typingIndicator.textContent = '';
+                    }
+                });
+
+                // Comment and Report click handlers
+                chatContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('comment-button')) {
+                        selectedMessage = e.target.closest('.message');
+                        isCommentMode = true;
+                        modeIndicator.style.display = 'block';
+                        messageInput.placeholder = 'Write a comment...';
+                        messageInput.focus();
+                    }
+
+                    if (e.target.classList.contains('report-button')) {
+                        openReportDialog(e.target.closest('.message'));
+                    }
+                });
+
+            } catch (error) {
+                console.error('Chat initialization error:', error);
+            }
+
+            function displayMessage(data) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${data.username === userData.username ? 'user' : ''}`;
+                messageDiv.id = data._id || Date.now().toString();
+                messageDiv.dataset.messageId = data._id || Date.now().toString();
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+
+                const username = document.createElement('div');
+                username.className = 'username';
+                username.textContent = data.username;
+
+                const text = document.createElement('div');
+                text.className = 'text';
+                text.textContent = data.text;
+
+                const timestamp = document.createElement('div');
+                timestamp.className = 'timestamp';
+                timestamp.textContent = typeof data.timestamp === 'string' ? data.timestamp : 
+                    new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const actions = document.createElement('div');
+                actions.className = 'message-actions';
+
+                const commentButton = document.createElement('button');
+                commentButton.className = 'comment-button';
+                commentButton.innerHTML = '💬 Comment';
+
+                const reportButton = document.createElement('button');
+                reportButton.className = 'report-button';
+                reportButton.innerHTML = '⚠️ Report';
+
+                const reportStatus = document.createElement('span');
+                reportStatus.className = 'report-status';
+                reportStatus.textContent = '🚫 Reported';
+                reportStatus.style.display = 'none';
+
+                actions.appendChild(commentButton);
+                actions.appendChild(reportButton);
+                actions.appendChild(reportStatus);
+
+                messageContent.appendChild(username);
+                messageContent.appendChild(text);
+                messageContent.appendChild(timestamp);
+                messageContent.appendChild(actions);
+
+                const commentsContainer = document.createElement('div');
+                commentsContainer.className = 'comments-container';
+                
+                // Display existing comments if any
+                if (data.comments && data.comments.length > 0) {
+                    data.comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment';
+                        commentElement.innerHTML = `
+                            <span class="comment-username">${comment.username}</span>
+                            <span class="comment-text">${comment.comment}</span>
+                            <span class="comment-timestamp">${new Date(comment.createdAt).toLocaleTimeString()}</span>
+                        `;
+                        commentsContainer.appendChild(commentElement);
+                    });
+                }
+                
+                messageContent.appendChild(commentsContainer);
+                messageDiv.appendChild(messageContent);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                reportButton.addEventListener('click', () => openReportDialog(messageDiv));
+            }
+        });
+    </script>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="report-dialog" id="report-dialog">
+        <h3>Report Message</h3>
+        <div class="report-form">
+            <div class="report-category">
+                <label for="report-type">What's wrong with this message?</label>
+                <select id="report-type" required>
+                    <option value="">Select a reason</option>
+                    <option value="harassment">Harassment or Bullying</option>
+                    <option value="spam">Spam or Advertising</option>
+                    <option value="inappropriate">Inappropriate Content</option>
+                    <option value="hate">Hate Speech</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="report-details">
+                <label for="report-reason">Additional Details (Optional)</label>
+                <textarea id="report-reason" 
+                          placeholder="Please provide any additional context..."
+                          rows="4"></textarea>
+            </div>
+            <div class="report-dialog-buttons">
+                <button class="report-cancel" onclick="closeReportDialog()">Cancel</button>
+                <button class="report-submit" onclick="submitReport()">Submit Report</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

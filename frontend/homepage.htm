@@ -1,0 +1,474 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Discussions</title>
+    <style>
+        /* General styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Header styling */
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+        .header {
+            background-color: #111;
+            color: #ff5c5c;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Comic Neue', cursive;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            color: #ff5c5c;
+            letter-spacing: 2px;
+        }
+
+        /* Main content container */
+        .main-container {
+            background-color: #111;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .main-container h1 {
+            color: #ff5c5c;
+            font-size: 48px;
+            font-family: 'Comic Neue';
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .main-container h2 {
+            font-size: 32px;
+            font-family: 'Comic Neue';
+            margin-bottom: 20px;
+        }
+
+        /* Discussion cards grid */
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Card styling */
+        .card {
+            background-color: #222;
+            width: 250px;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .card h3 {
+            color: #ff5c5c;
+            font-size: 20px;
+            margin: 10px 0;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .card button {
+            background-color: #ff5c5c;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #ff5c5c;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .footer .links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        #loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .user-info span {
+            color: #333;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        #username-display {
+            color: #ff5c5c;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .explore-title {
+            color: white;
+            font-size: 42px;
+            margin: 20px 0 40px 0;
+            text-align: center;
+        }
+
+        .welcome-section {
+            display: none;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .main-container h1 {
+                font-size: 36px;
+            }
+
+            .explore-title {
+                font-size: 28px;
+                margin: 15px 0 30px 0;
+            }
+
+            .card-grid {
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .card {
+                width: calc(50% - 15px);
+                min-width: 200px;
+            }
+
+            .user-info {
+                padding: 8px 15px;
+                right: 10px;
+                top: 10px;
+            }
+
+            .user-info span {
+                font-size: 14px;
+            }
+
+            .logout-btn {
+                padding: 6px 15px;
+                font-size: 12px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .main-container h1 {
+                font-size: 28px;
+            }
+
+            .explore-title {
+                font-size: 24px;
+                margin: 10px 0 20px 0;
+            }
+
+            .card-grid {
+                padding: 5px;
+                gap: 10px;
+            }
+
+            .card {
+                width: 100%;
+                margin: 0 10px;
+            }
+
+            .card h3 {
+                font-size: 18px;
+            }
+
+            .card p {
+                font-size: 13px;
+            }
+
+            .card button {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .footer {
+                padding: 15px;
+                font-size: 12px;
+            }
+
+            .footer .links {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="user-info">
+            <span>Welcome, <span id="username-display"></span>!</span>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <h1 class="site-title">Gossin</h1>
+        <h2 class="explore-title">Explore Discussions</h2>
+        
+        <!-- Card Grid -->
+        <div class="card-grid">
+            <!-- Card 1 -->
+            <div class="card">
+                <img src="gossip.jpeg" alt="Gossips">
+                <h3>Gossips</h3>
+                <p>Spotted something shady or juicy on campus? Spill the tea here—but remember, no holding back!</p>
+                <button onclick="joinDiscussion('Gossip.htm')">Join Discussion</button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <img src="confessions.jpeg" alt="Confessions">
+                <h3>Confessions</h3>
+                <p>Got a secret crush or a hilarious fail? Time to confess, and we won’t judge... maybe.</p>
+                <button onclick="joinDiscussion('Confession.htm')">Join Discussion</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <img src="opinions.jpeg" alt="Opinions and Experiences">
+                <h3>Opinions and Personal Experiences</h3>
+                <p>Wild stories, bold opinions, and unforgettable moments—share yours and see who agrees (or disagrees)!</p>
+                <button onclick="joinDiscussion('Opinion.htm')">Join Discussion</button>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="card">
+                <img src="classroom.jpeg" alt="Classroom Drama">
+                <h3>Classroom DRAMA</h3>
+                <p>Classroom chaos got you shook? Jump into the drama happening in your class—let’s talk assignments, professors, and more!</p>
+                <button onclick="joinDiscussion('Classroom.htm')">Join Discussion</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="links">
+            <a href="homepage.htm">Home</a>
+            <a href="about.htm">About</a>
+            <a href="contact.htm">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        // Add this function to handle logout
+        async function handleLogout() {
+            try {
+                // Clear local storage
+                localStorage.removeItem('token');
+                localStorage.removeItem('userData');
+                
+                // Optional: Call logout endpoint if you want to invalidate token on server
+                const response = await fetch('http://localhost:3000/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.warn('Logout request failed:', response.status);
+                }
+
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                // Always redirect to login page
+                window.location.href = 'login.htm';
+            }
+        }
+
+        // Update the existing DOMContentLoaded event listener
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check authentication
+            const token = localStorage.getItem('token');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            console.log('Checking auth:', { token: !!token, userData });
+            
+            if (!token) {
+                console.log('No token found, redirecting to login');
+                window.location.href = 'login.htm';
+                return;
+            }
+
+            // User is authenticated, initialize the page
+            console.log('User authenticated:', userData.username);
+            
+            // Add logout functionality
+            document.getElementById('logoutButton')?.addEventListener('click', handleLogout);
+        });
+
+        async function joinDiscussion(page) {
+            console.log('Join Discussion clicked');
+            
+            try {
+                const token = localStorage.getItem('token');
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                
+                console.log('Stored token:', token);
+                console.log('Stored user data:', userData);
+                
+                if (!token) {
+                    throw new Error('No token found');
+                }
+
+                // Verify token with server
+                const response = await fetch('http://localhost:3000/api/auth/verify', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log('Verify response status:', response.status);
+                const data = await response.json();
+                console.log('Verify response data:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Authentication failed');
+                }
+
+                if (!data.verified) {
+                    throw new Error('Token verification failed');
+                }
+
+                // Update user data if needed
+                if (data.user) {
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                }
+
+                // Token is valid, proceed to chat
+                console.log('Authentication verified, proceeding to chat...');
+                window.location.href = page;
+
+            } catch (error) {
+                console.error('Error:', error);
+                // Only clear storage if token is invalid
+                if (error.message.includes('token')) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userData');
+                }
+                alert('Please log in again to join the discussion.');
+                window.location.href = 'login.htm';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const usernameDisplay = document.getElementById('username-display');
+            
+            if (userData && userData.username) {
+                usernameDisplay.textContent = userData.username;
+            }
+        });
+    </script>
+</body>
+</html>
